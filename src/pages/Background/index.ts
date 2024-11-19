@@ -13,6 +13,7 @@ import { getCsrfTokenFetch, getSessionFetch, performLoginOrLogoutFetch } from '.
 import OnInputEnteredDisposition = chrome.omnibox.OnInputEnteredDisposition;
 
 const browser = getBrowser();
+let configuration = null;
 
 // This is the main functions that will be called when a bookmark is created, update or deleted
 // Won't work with axios xhr or something not supported by the browser
@@ -280,10 +281,10 @@ browser.omnibox.onInputChanged.addListener(async (text: string, suggest: (arg0: 
   });
 
   const bookmarkSuggestions = searchedBookmarks.map(bookmark => {
-     return {
-       content: bookmark.url,
-       description: bookmark.name || bookmark.url
-     }
+    return {
+      content: bookmark.url,
+      description: bookmark.name || bookmark.url
+    }
   });
   suggest(bookmarkSuggestions)
 
@@ -296,10 +297,15 @@ browser.omnibox.onInputEntered.addListener(async (content: string, disposition: 
     return;
   }
 
+  configuration = await getConfig();
+
   const isUrl = /^http(s)?:\/\//.test(content);
+
+
+// This part was taken https://github.com/sissbruecker/linkding-extension/blob/master/src/background.js Thanks to @sissbruecker
   const url = isUrl
     ? content
-    : `lk`;
+    : `${configuration.baseUrl}/search?q=${encodeURIComponent(content)}`;
 
   // Edge doesn't allow updating the New Tab Page (tested with version 117).
   // Trying to do so will throw: "Error: Cannot update NTP tab."
