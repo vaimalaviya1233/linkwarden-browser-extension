@@ -129,7 +129,7 @@ const BookmarkForm = () => {
     },
     onSuccess: () => {
       setTimeout(() => {
-        window.close();
+        // window.close();
         // I want to show some confirmation before it's closed...
       }, 1000);
       toast({
